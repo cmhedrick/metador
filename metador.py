@@ -1,15 +1,12 @@
-import exifread
+import piexif
 
-# images need to be opened in binary
-f = open('image.jpg', 'rb')
+exif_dict = piexif.load("IMG.JPG")
+for tag_type in ("0th", "Exif", "GPS", "1st"):
+    for tag in exif_dict[tag_type]:
+        print(piexif.TAGS[tag_type][tag]["name"], exif_dict[tag_type][tag])
 
-# Return Exif tags
-tags = exifread.process_file(f)
-
-# get just GPS coords
-print(
-    'Lat: {0}|Long: {1}'.format(
-        tags['GPS GPSLatitude'],
-        tags['GPS GPSLongitude']
-    )
-)
+piexif.remove("IMG.JPG")
+print('\nREMOVED?\n')
+for tag_type in ("0th", "Exif", "GPS", "1st"):
+    for tag in exif_dict[tag_type]:
+        print(piexif.TAGS[tag_type][tag]["name"], exif_dict[tag_type][tag])

@@ -1,4 +1,7 @@
-image.jpg
+*.jpg
+*.JPG
+*.png
+*.PNG
 env/
 *.pyc
 .idea/
