@@ -1,7 +1,46 @@
 #!/usr/bin/python3
 import io
+import datetime
+import random
 import piexif
 from PIL import Image
+
+
+def random_datetime(
+        start_date=datetime.datetime(1970, 1, 1),
+        date_format='%Y:%m:%d %X'
+    ):
+    '''
+    pseudorandomly generates datetime stamp in given format based on start date
+    provided. default format '%Y:%m:%d %X' (e.g: '2008:08:09 04:17:19')
+    :param start_date: datetime object | default: datetime.datetime(1970, 1, 1)
+    :param date_format: string | default: '%Y:%m:%d %X'
+    :return:
+    '''
+    diff_time = (datetime.datetime.now() - start_date)
+    day_delta = random.randrange(-diff_time.days, diff_time.days)
+    if day_delta < 0:
+        return (
+            datetime.datetime.now() + datetime.timedelta(
+                days=day_delta,
+                hours=random.randrange(-23,23),
+                minutes=random.randrange(-59,59),
+                seconds=random.randrange(-59,59),
+                milliseconds=random.randrange(-999,999),
+                microseconds=random.randrange(-999,999)
+            )
+        ).strftime(date_format)
+    else:
+        return (
+            datetime.datetime(1970, 1, 1) + datetime.timedelta(
+                days=day_delta,
+                hours=random.randrange(-23, 23),
+                minutes=random.randrange(-59, 59),
+                seconds=random.randrange(-59, 59),
+                milliseconds=random.randrange(-999, 999),
+                microseconds=random.randrange(-999, 999)
+            )
+        ).strftime(date_format)
 
 def spoof_data(in_image):
     o = io.BytesIO()
