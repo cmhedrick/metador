@@ -42,13 +42,41 @@ def random_datetime(
             )
         ).strftime(date_format)
 
+def random_lat():
+    '''
+    pseudorandomly generate Latitude along with Reference
+    :return: list | [reference, lat]
+    '''
+    lat = int(random.uniform(-90,90) * 1000000)
+    if lat >= 0:
+        ref = 'N'
+    else:
+        ref = 'S'
+    return [ref, lat]
+
+def random_lat():
+    '''
+    pseudorandomly generate Longitude along with Reference
+    :return: [reference, long]
+    '''
+    long = int(random.uniform(-180,180) * 1000000)
+    if long >= 0:
+        ref = 'E'
+    else:
+        ref = 'W'
+    return [ref, long]
+
 def spoof_data(in_image):
+    '''
+    takes path to image and creates a copy with spoofed exif data
+    :param in_image: string path to image
+    :return: None
+    '''
     o = io.BytesIO()
     thumb_im = Image.open(in_image)
     thumb_im.thumbnail((50, 50), Image.ANTIALIAS)
     thumb_im.save(o, "jpeg")
     thumbnail = o.getvalue()
-
     zeroth_ifd = {piexif.ImageIFD.Make: u"iPhone",
                   piexif.ImageIFD.XResolution: (96, 1),
                   piexif.ImageIFD.YResolution: (96, 1),
@@ -62,7 +90,9 @@ def spoof_data(in_image):
                 }
     gps_ifd = {piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
                piexif.GPSIFD.GPSAltitudeRef: 1,
-               piexif.GPSIFD.GPSDateStamp: u"1999:05:05 10:10:10",
+               piexif.GPSIFD.GPSLatitude: [86399607, 1000000],
+               piexif.GPSIFD.GPSLongitude: [56119658, 1000000],
+               piexif.GPSIFD.GPSDateStamp: random_datetime(),
                }
     first_ifd = {piexif.ImageIFD.Make: u"iPhone",
                  piexif.ImageIFD.XResolution: (40, 1),
