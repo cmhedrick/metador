@@ -72,7 +72,8 @@ def random_device():
     :return: string
     '''
     devices = [
-        'Android', 'Canon', 'GoPro', 'iPhone', 'Sony'
+        'Android', 'Canon', 'GoPro', 'iPhone', 'iPhone 5', 'iPhone 6',
+        'iPhone 7', 'Sony'
     ]
     return devices[random.randrange(0, len(devices))]
 
@@ -94,12 +95,13 @@ def spoof_data(in_image):
     thumbnail = o.getvalue()
     zeroth_ifd = {
         piexif.ImageIFD.Make: device,
-        piexif.ImageIFD.XResolution: (96, 1),
-        piexif.ImageIFD.YResolution: (96, 1),
+        piexif.ImageIFD.XResolution: (72, 1),
+        piexif.ImageIFD.YResolution: (72, 1),
         piexif.ImageIFD.Software: u"Camera"
     }
     exif_ifd = {
         piexif.ExifIFD.DateTimeOriginal: date_stamp,
+        piexif.ExifIFD.ColorSpace: 1,
         piexif.ExifIFD.LensMake: device,
         piexif.ExifIFD.Sharpness: 65535,
         piexif.ExifIFD.LensSpecification: (
@@ -117,8 +119,9 @@ def spoof_data(in_image):
     }
     first_ifd = {
         piexif.ImageIFD.Make: device,
-        piexif.ImageIFD.XResolution: (40, 1),
-        piexif.ImageIFD.YResolution: (40, 1),
+        piexif.ImageIFD.Compression: 1,
+        piexif.ImageIFD.XResolution: (72, 1),
+        piexif.ImageIFD.YResolution: (72, 1),
         piexif.ImageIFD.Software: u"Camera"
     }
     exif_dict = {
