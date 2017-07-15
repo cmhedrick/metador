@@ -52,7 +52,7 @@ def random_lat():
         ref = 'N'
     else:
         ref = 'S'
-    return [ref, lat]
+    return [ref, abs(lat)]
 
 def random_long():
     '''
@@ -64,7 +64,7 @@ def random_long():
         ref = 'E'
     else:
         ref = 'W'
-    return [ref, long]
+    return [ref, abs(long)]
 
 def spoof_data(in_image):
     '''
@@ -94,8 +94,10 @@ def spoof_data(in_image):
                 }
     gps_ifd = {piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
                piexif.GPSIFD.GPSAltitudeRef: 1,
-               piexif.GPSIFD.GPSLatitude: [86399607, 1000000],
-               piexif.GPSIFD.GPSLongitude: [56119658, 1000000],
+               piexif.GPSIFD.GPSLatitudeRef: lat[0],
+               piexif.GPSIFD.GPSLatitude: [lat[1], 1000000],
+               piexif.GPSIFD.GPSLongitudeRef: long[0],
+               piexif.GPSIFD.GPSLongitude: [long[1], 1000000],
                piexif.GPSIFD.GPSDateStamp: date_stamp,
                }
     first_ifd = {piexif.ImageIFD.Make: u"iPhone",
