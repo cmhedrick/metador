@@ -66,6 +66,16 @@ def random_long():
         ref = 'W'
     return [ref, abs(long)]
 
+def random_device():
+    '''
+    pseudorandomly chooses a device from device list
+    :return: string
+    '''
+    devices = [
+        'Android', 'Canon', 'GoPro', 'iPhone', 'Sony'
+    ]
+    return devices[random.randrange(0, len(devices))]
+
 def spoof_data(in_image):
     '''
     takes path to image and creates a copy with spoofed exif data
@@ -75,42 +85,48 @@ def spoof_data(in_image):
     lat = random_lat()
     long = random_long()
     date_stamp = random_datetime()
+    device = random_device()
 
     o = io.BytesIO()
     thumb_im = Image.open(in_image)
     thumb_im.thumbnail((50, 50), Image.ANTIALIAS)
     thumb_im.save(o, "jpeg")
     thumbnail = o.getvalue()
-    zeroth_ifd = {piexif.ImageIFD.Make: u"iPhone",
-                  piexif.ImageIFD.XResolution: (96, 1),
-                  piexif.ImageIFD.YResolution: (96, 1),
-                  piexif.ImageIFD.Software: u"Camera"
-                  }
-    exif_ifd = {piexif.ExifIFD.DateTimeOriginal: date_stamp,
-                piexif.ExifIFD.LensMake: u"iPhone",
-                piexif.ExifIFD.Sharpness: 65535,
-                piexif.ExifIFD.LensSpecification: (
-                (1, 1), (1, 1), (1, 1), (1, 1)),
-                }
-    gps_ifd = {piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
-               piexif.GPSIFD.GPSAltitudeRef: 1,
-               piexif.GPSIFD.GPSLatitudeRef: lat[0],
-               piexif.GPSIFD.GPSLatitude: [lat[1], 1000000],
-               piexif.GPSIFD.GPSLongitudeRef: long[0],
-               piexif.GPSIFD.GPSLongitude: [long[1], 1000000],
-               piexif.GPSIFD.GPSDateStamp: date_stamp,
-               }
-    first_ifd = {piexif.ImageIFD.Make: u"iPhone",
-                 piexif.ImageIFD.XResolution: (40, 1),
-                 piexif.ImageIFD.YResolution: (40, 1),
-                 piexif.ImageIFD.Software: u"Camera"
-                 }
-
-    exif_dict = {"0th": zeroth_ifd, "Exif": exif_ifd, "GPS": gps_ifd,
-                 "1st": first_ifd, "thumbnail": thumbnail}
+    zeroth_ifd = {
+        piexif.ImageIFD.Make: device,
+        piexif.ImageIFD.XResolution: (96, 1),
+        piexif.ImageIFD.YResolution: (96, 1),
+        piexif.ImageIFD.Software: u"Camera"
+    }
+    exif_ifd = {
+        piexif.ExifIFD.DateTimeOriginal: date_stamp,
+        piexif.ExifIFD.LensMake: device,
+        piexif.ExifIFD.Sharpness: 65535,
+        piexif.ExifIFD.LensSpecification: (
+            (1, 1), (1, 1), (1, 1), (1, 1)
+        ),
+    }
+    gps_ifd = {
+        piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
+        piexif.GPSIFD.GPSAltitudeRef: 1,
+        piexif.GPSIFD.GPSLatitudeRef: lat[0],
+        piexif.GPSIFD.GPSLatitude: [lat[1], 1000000],
+        piexif.GPSIFD.GPSLongitudeRef: long[0],
+        piexif.GPSIFD.GPSLongitude: [long[1], 1000000],
+        piexif.GPSIFD.GPSDateStamp: date_stamp,
+    }
+    first_ifd = {
+        piexif.ImageIFD.Make: device,
+        piexif.ImageIFD.XResolution: (40, 1),
+        piexif.ImageIFD.YResolution: (40, 1),
+        piexif.ImageIFD.Software: u"Camera"
+    }
+    exif_dict = {
+        "0th": zeroth_ifd, "Exif": exif_ifd, "GPS": gps_ifd,
+        "1st": first_ifd, "thumbnail": thumbnail
+    }
     exif_bytes = piexif.dump(exif_dict)
     im = Image.open(in_image)
-    im.thumbnail((100, 100), Image.ANTIALIAS)
     im.save("out.jpg", exif=exif_bytes)
 
 if __name__ == "__main__":
