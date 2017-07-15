@@ -54,7 +54,7 @@ def random_lat():
         ref = 'S'
     return [ref, lat]
 
-def random_lat():
+def random_long():
     '''
     pseudorandomly generate Longitude along with Reference
     :return: [reference, long]
@@ -72,6 +72,10 @@ def spoof_data(in_image):
     :param in_image: string path to image
     :return: None
     '''
+    lat = random_lat()
+    long = random_long()
+    date_stamp = random_datetime()
+
     o = io.BytesIO()
     thumb_im = Image.open(in_image)
     thumb_im.thumbnail((50, 50), Image.ANTIALIAS)
@@ -82,7 +86,7 @@ def spoof_data(in_image):
                   piexif.ImageIFD.YResolution: (96, 1),
                   piexif.ImageIFD.Software: u"Camera"
                   }
-    exif_ifd = {piexif.ExifIFD.DateTimeOriginal: u"2005:11:30 01:01:01",
+    exif_ifd = {piexif.ExifIFD.DateTimeOriginal: date_stamp,
                 piexif.ExifIFD.LensMake: u"iPhone",
                 piexif.ExifIFD.Sharpness: 65535,
                 piexif.ExifIFD.LensSpecification: (
@@ -92,7 +96,7 @@ def spoof_data(in_image):
                piexif.GPSIFD.GPSAltitudeRef: 1,
                piexif.GPSIFD.GPSLatitude: [86399607, 1000000],
                piexif.GPSIFD.GPSLongitude: [56119658, 1000000],
-               piexif.GPSIFD.GPSDateStamp: random_datetime(),
+               piexif.GPSIFD.GPSDateStamp: date_stamp,
                }
     first_ifd = {piexif.ImageIFD.Make: u"iPhone",
                  piexif.ImageIFD.XResolution: (40, 1),
