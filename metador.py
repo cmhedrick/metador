@@ -72,8 +72,8 @@ def random_device():
     :return: string
     '''
     devices = [
-        'Android', 'Canon', 'GoPro', 'iPhone', 'iPhone 5', 'iPhone 6',
-        'iPhone 7', 'Sony'
+        'Android', 'Canon', 'GoPro', 'iPhone', 'iPhone 5', 'iPhone 5c',
+        'iPhone 5s', 'iPhone SE', 'iPhone 6', 'iPhone 7', 'Sony'
     ]
     return devices[random.randrange(0, len(devices))]
 
@@ -136,6 +136,7 @@ if __name__ == "__main__":
     print('welcome! cmds include:')
     print('remove| removes data')
     print('spoof| spoof data')
+    print('man-spoof| manual spoof for certain tags')
     print('read| print tags')
     in_file = input('File Path==> ')
     cmd = input('command==> ')
