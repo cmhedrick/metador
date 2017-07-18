@@ -5,6 +5,28 @@ import random
 import piexif
 from PIL import Image
 
+zeroth_ifd = {
+    piexif.ImageIFD.XResolution: (72, 1),
+    piexif.ImageIFD.YResolution: (72, 1),
+    piexif.ImageIFD.Software: u"Camera"
+}
+exif_ifd = {
+    piexif.ExifIFD.ColorSpace: 1,
+    piexif.ExifIFD.Sharpness: 65535,
+    piexif.ExifIFD.LensSpecification: (
+        (1, 1), (1, 1), (1, 1), (1, 1)
+    ),
+}
+gps_ifd = {
+    piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
+    piexif.GPSIFD.GPSAltitudeRef: 1,
+}
+first_ifd = {
+    piexif.ImageIFD.Compression: 1,
+    piexif.ImageIFD.XResolution: (72, 1),
+    piexif.ImageIFD.YResolution: (72, 1),
+    piexif.ImageIFD.Software: u"Camera"
+}
 
 def random_datetime(
         start_date=datetime.datetime(1970, 1, 1),
@@ -88,42 +110,24 @@ def spoof_data(in_image):
     date_stamp = random_datetime()
     device = random_device()
 
+    zeroth_ifd[piexif.ImageIFD.Make] = device
+
+    exif_ifd[piexif.ExifIFD.DateTimeOriginal] = date_stamp
+    exif_ifd[piexif.ExifIFD.LensMake] = device
+
+    gps_ifd[piexif.GPSIFD.GPSLatitudeRef] = lat[0]
+    gps_ifd[piexif.GPSIFD.GPSLatitude] = [lat[1], 1000000]
+    gps_ifd[piexif.GPSIFD.GPSLongitudeRef] = long[0]
+    gps_ifd[piexif.GPSIFD.GPSLongitude] = [long[1], 1000000]
+    gps_ifd[piexif.GPSIFD.GPSDateStamp] = date_stamp
+
+    first_ifd[piexif.ImageIFD.Make] = device
+
     o = io.BytesIO()
     thumb_im = Image.open(in_image)
     thumb_im.thumbnail((50, 50), Image.ANTIALIAS)
     thumb_im.save(o, "jpeg")
     thumbnail = o.getvalue()
-    zeroth_ifd = {
-        piexif.ImageIFD.Make: device,
-        piexif.ImageIFD.XResolution: (72, 1),
-        piexif.ImageIFD.YResolution: (72, 1),
-        piexif.ImageIFD.Software: u"Camera"
-    }
-    exif_ifd = {
-        piexif.ExifIFD.DateTimeOriginal: date_stamp,
-        piexif.ExifIFD.ColorSpace: 1,
-        piexif.ExifIFD.LensMake: device,
-        piexif.ExifIFD.Sharpness: 65535,
-        piexif.ExifIFD.LensSpecification: (
-            (1, 1), (1, 1), (1, 1), (1, 1)
-        ),
-    }
-    gps_ifd = {
-        piexif.GPSIFD.GPSVersionID: (2, 0, 0, 0),
-        piexif.GPSIFD.GPSAltitudeRef: 1,
-        piexif.GPSIFD.GPSLatitudeRef: lat[0],
-        piexif.GPSIFD.GPSLatitude: [lat[1], 1000000],
-        piexif.GPSIFD.GPSLongitudeRef: long[0],
-        piexif.GPSIFD.GPSLongitude: [long[1], 1000000],
-        piexif.GPSIFD.GPSDateStamp: date_stamp,
-    }
-    first_ifd = {
-        piexif.ImageIFD.Make: device,
-        piexif.ImageIFD.Compression: 1,
-        piexif.ImageIFD.XResolution: (72, 1),
-        piexif.ImageIFD.YResolution: (72, 1),
-        piexif.ImageIFD.Software: u"Camera"
-    }
     exif_dict = {
         "0th": zeroth_ifd, "Exif": exif_ifd, "GPS": gps_ifd,
         "1st": first_ifd, "thumbnail": thumbnail
