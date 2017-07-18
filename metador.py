@@ -136,6 +136,46 @@ def spoof_data(in_image):
     im = Image.open(in_image)
     im.save("out.jpg", exif=exif_bytes)
 
+def man_spoof(lat, long, date_stamp, device, in_image):
+    if lat[0].strip() == '' or lat[1].strip() == '':
+        lat = random_lat()
+    else:
+        lat[1] = int(float(lat[1]) * 1000000)
+    if long[0].strip() == '' or long[1].strip() == '':
+        long = random_long()
+    else:
+        long[1] = int(float(long[1]) * 1000000)
+    if date_stamp.strip() == '':
+        date_stamp = random_datetime()
+    if device.strip() == '':
+        device = random_device()
+
+    zeroth_ifd[piexif.ImageIFD.Make] = device
+
+    exif_ifd[piexif.ExifIFD.DateTimeOriginal] = date_stamp
+    exif_ifd[piexif.ExifIFD.LensMake] = device
+
+    gps_ifd[piexif.GPSIFD.GPSLatitudeRef] = lat[0]
+    gps_ifd[piexif.GPSIFD.GPSLatitude] = [lat[1], 1000000]
+    gps_ifd[piexif.GPSIFD.GPSLongitudeRef] = long[0]
+    gps_ifd[piexif.GPSIFD.GPSLongitude] = [long[1], 1000000]
+    gps_ifd[piexif.GPSIFD.GPSDateStamp] = date_stamp
+
+    first_ifd[piexif.ImageIFD.Make] = device
+
+    o = io.BytesIO()
+    thumb_im = Image.open(in_image)
+    thumb_im.thumbnail((50, 50), Image.ANTIALIAS)
+    thumb_im.save(o, "jpeg")
+    thumbnail = o.getvalue()
+    exif_dict = {
+        "0th": zeroth_ifd, "Exif": exif_ifd, "GPS": gps_ifd,
+        "1st": first_ifd, "thumbnail": thumbnail
+    }
+    exif_bytes = piexif.dump(exif_dict)
+    im = Image.open(in_image)
+    im.save("out.jpg", exif=exif_bytes)
+
 if __name__ == "__main__":
     print('welcome! cmds include:')
     print('remove| removes data')
@@ -152,6 +192,27 @@ if __name__ == "__main__":
     elif cmd.lower() == 'spoof':
         print('SPOOFING DATA')
         spoof_data(in_file)
+
+    elif cmd.lower() == 'man-spoof':
+        print('All blank fields will be randomized.')
+        print('Press Enter To Continue')
+        lat_ref = input('Latiude Ref (N,S)==> ')
+        print('Format: XX.XXX')
+        lat = input('Latiude==> ')
+        long_ref = input('Longitude Ref (E,W)==> ')
+        print('Format: XX.XXX')
+        long = input('Longitude==> ')
+        print('Timestamp format: YYYY:MM:DD HH:MM:SS (24Hour Time)')
+        date_stamp = input('Timestamp==> ')
+        device = input('Device==> ')
+        man_spoof(
+            [lat_ref, lat],
+            [long_ref, long],
+            date_stamp,
+            device,
+            in_file
+        )
+        print('SPOOFING DATA')
 
     elif cmd.lower() == 'read':
         try:
